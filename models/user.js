@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { createHmac } = require("node:crypto");
 const { Schema } = mongoose;
-const uuidv1 = require("uuid/v1");
+const uuidv4 = require("uuid");
 
 const userSchema = new Schema(
   {
@@ -48,23 +48,28 @@ userSchema
   .set(function (password) {
     // using _ means , we keep _password private.
     this._password = password;
-    this.salt = uuidv1();
+    this.salt = uuidv4();
     this.encry_password = this.securePassword(password);
   })
   .get(function () {
-    return this._password;
+    return this.password;
   });
 
-userSchema.method = {
+userSchema.methods = {
   authenticate: function (plainPassword) {
     return this.securePassword(plainPassword) === this.encry_password;
   },
   securePassword: function (plainPassword) {
     if (!plainPassword) return "";
     try {
-      return createHmac("sha256", this.salt)
-        .update(plainPassword)
+      const tempSalt = this.salt;
+      const hashpassword = createHmac("sha256", this.salt)
+        .update(plainpassword)
         .digest("hex");
+
+      console.log(tempSalt);
+      console.log(hashpassword);
+      return hashpassword;
     } catch (error) {
       return "";
     }
@@ -72,3 +77,11 @@ userSchema.method = {
 };
 
 module.exports = mongoose.model("User", userSchema);
+
+// const { createHmac } = require("node:crypto");
+
+// const secret = "abcdefg";
+// const hash = createHmac("sha256", secret)
+//   .update("I love cupcakes")
+//   .digest("hex");
+// console.log(hash);
