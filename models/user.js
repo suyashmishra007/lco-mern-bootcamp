@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const { createHmac } = require("node:crypto");
 const { Schema } = mongoose;
-const uuidv4 = require("uuid");
 const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 
@@ -44,34 +42,6 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// userSchema
-//   .virtual("password")
-//   .set(function (password) {
-//     // using _ means , we keep _password private.
-//     this._password = password;
-//     this.salt = uuidv4();
-//     this.encry_password = this.securePassword(password);
-//   })
-//   .get(function () {
-//     return this.password;
-//   });
-
-// userSchema.methods = {
-//   authenticate: function (plainPassword) {
-//     return this.securePassword(plainPassword) === this.encry_password;
-//   },
-//   securePassword: function (plainPassword) {
-//     if (!plainPassword) return "";
-//     try {
-//       return createHmac("sha256", this.salt)
-//         .update(plainPassword)
-//         .digest("hex");
-//     } catch (error) {
-//       return "";
-//     }
-//   },
-// };
 
 userSchema.pre("save", function (next) {
   // https://stackoverflow.com/questions/14588032/mongoose-password-hashing
