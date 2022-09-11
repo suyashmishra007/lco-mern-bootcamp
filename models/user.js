@@ -64,14 +64,19 @@ userSchema.pre("save", function (next) {
   });
 });
 
-userSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(
-    candidatePassword,
-    this.encry_password,
-    function (err, isMatch) {
-      if (err) return cb(err);
-      cb(null, isMatch);
-    }
-  );
+// ? WHY NOT WORKING
+userSchema.methods.comparePassword = function (candidatePassword) {
+  const currentEncryPass = this.encry_password;
+  console.log(currentEncryPass);
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(
+      candidatePassword,
+      currentEncryPass,
+      function (err, isMatch) {
+        if (err) return reject(err);
+        resolve(isMatch);
+      }
+    );
+  });
 };
 module.exports = mongoose.model("User", userSchema);
